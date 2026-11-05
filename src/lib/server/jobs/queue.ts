@@ -11,6 +11,8 @@ export interface RunContext<I, S> {
 }
 
 export interface JobSpec<I, S, O> {
+	/** Defaults to a random UUID. */
+	id?: string;
 	toolId: string;
 	lane: Lane;
 	input: I;
@@ -93,7 +95,7 @@ export function createJobQueue(
 
 	function submit<I, S, O>(spec: JobSpec<I, S, O>): Job<O> {
 		const job: Job<O> = {
-			id: randomUUID(),
+			id: spec.id ?? randomUUID(),
 			toolId: spec.toolId,
 			lane: spec.lane,
 			status: 'queued',
@@ -111,7 +113,7 @@ export function createJobQueue(
 		retry(id: string): Job | undefined {
 			const entry = entries.get(id);
 			if (entry?.job.status !== 'failed') return undefined;
-			return submit(entry.spec);
+			return submit({ ...entry.spec, id: undefined });
 		},
 
 		cancel(id: string): void {

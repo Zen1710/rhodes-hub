@@ -14,7 +14,8 @@ Local file-processing Tools (Image, Music) served by one SvelteKit app on `127.0
 - Everything in the repo is English: UI copy, docs, comments, commit messages (Conventional Commits).
 - Each Tool lives in `src/tools/<category>/<tool>/`: `meta.ts` is client-safe (name, keywords, Lane, accepted formats, size limits, dependencies, settings with defaults), `run.ts` is server-only. Sidebar, home, routing, validation, and dependency checks are generated from this registry, never hand-listed.
 - Every Tool runs as a Job in a Lane (Heavy: 1 at a time, Light: up to 2). Job status is one of `queued`, `running`, `done`, `failed`, `canceled`.
-- The API is a public contract documented in the README: `POST /api/tools/<category>/<tool>`, `GET /api/jobs/<id>`, `GET /api/jobs/<id>/download`. Change it only with a README update in the same commit.
+- The API is a public contract documented in the README (`POST /api/tools/<category>/<tool>`, `GET /api/jobs/<id>`, downloads, cancel, retry). Change it only with a README update in the same commit. Route handlers stay thin: logic lives in `createJobService` (`src/lib/server/jobs/service.ts`), which is where API behavior is tested.
+- A Tool's `run.ts` default-exports a `ToolRunner`: it writes files to `outputDir` (each becomes an output) and must stop when `signal` aborts, checking `signal.aborted` before it starts work.
 - Tests use Vitest. Core logic (Lanes, Job status, cancel/retry, validation, cleanup) is written test-first; Light Tools get integration tests on small files in `tests/fixtures/`; Heavy Tools are tested against a fake Python script.
 - Work one feature per commit, and ask the user before every `git add`, commit, and push.
 

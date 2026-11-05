@@ -244,4 +244,20 @@ describe('job queue', () => {
 		expect(queue.get(running.id)?.status).toBe('running');
 		expect(queue.get(queued.id)?.status).toBe('queued');
 	});
+	it('uses the Job id the caller provides', async () => {
+		const queue = createJobQueue({ heavy: 1, light: 2 });
+		const { run } = controlledRun();
+
+		const job = queue.submit({
+			id: 'job-42',
+			toolId: 'm',
+			lane: 'light',
+			input: 'a',
+			settings: {},
+			run
+		});
+
+		expect(job.id).toBe('job-42');
+		expect(queue.get('job-42')?.toolId).toBe('m');
+	});
 });
