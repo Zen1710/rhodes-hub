@@ -5,6 +5,8 @@ import { createJobStorage, type JobStorage } from './storage';
 import { createJobService, type JobService } from './service';
 import { registry } from '../../tools/index.ts';
 import { runners } from '../tools.ts';
+import { checkDependencies, toolReadiness, type Readiness } from '../dependencies.ts';
+import { spawnProbe } from '../probe.ts';
 
 export * from './cleanup';
 export * from './queue';
@@ -18,6 +20,7 @@ const state = globalThis as typeof globalThis & {
 	__rhodesJobQueue?: JobQueue;
 	__rhodesJobStorage?: JobStorage;
 	__rhodesJobService?: JobService;
+	__rhodesReadiness?: Record<string, Readiness>;
 	__rhodesJobsStarted?: boolean;
 };
 
@@ -36,17 +39,28 @@ export function getJobService(): JobService {
 		queue: getJobQueue(),
 		storage: getJobStorage(),
 		registry,
-		runners
+		runners,
+		readiness: getReadiness()
 	});
 	return state.__rhodesJobService;
 }
 
-/** Runs once per process: wipes files left by the previous run, then cleans up expired Jobs every hour. */
+/** Per-Tool readiness from the startup dependency check. */
+export function getReadiness(): Record<string, Readiness> {
+	return state.__rhodesReadiness ?? {};
+}
+
+/** Runs once per process: wipes files left by the previous run, checks dependencies, then cleans up expired Jobs every hour. */
 export async function startJobs(): Promise<void> {
 	if (state.__rhodesJobsStarted) return;
 	state.__rhodesJobsStarted = true;
 
 	await getJobStorage().wipe();
+	state.__rhodesReadiness = toolReadiness(registry, await checkDependencies(spawnProbe), runners);
+	for (const [id, status] of Object.entries(state.__rhodesReadiness)) {
+		if (!status.ready)
+			console.warn(`Not ready: ${id}: ${status.problem}${status.fix ? ` Fix: ${status.fix}` : ''}`);
+	}
 	setInterval(() => {
 		cleanupExpired({ queue: getJobQueue(), storage: getJobStorage(), now: Date.now() }).catch(
 			(error) => console.error('Job cleanup failed:', error)

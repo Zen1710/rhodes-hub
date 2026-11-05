@@ -7,6 +7,7 @@ import { pipeline } from 'node:stream/promises';
 import type { Registry } from '#lib/tools/registry.ts';
 import { checkInput, formatBytes } from '#lib/tools/input.ts';
 import { parseSettings } from '#lib/tools/settings.ts';
+import type { Readiness } from '../dependencies';
 import type { JobQueue, JobStatus } from './queue';
 import { contentTypeOf } from './content-type';
 import type { JobStorage } from './storage';
@@ -92,6 +93,8 @@ interface ServiceDeps {
 	storage: JobStorage;
 	registry: Registry;
 	runners: Record<string, ToolRunner>;
+	/** From the startup dependency check; a Tool missing here counts as ready. */
+	readiness?: Record<string, Readiness>;
 }
 
 /** photo.jpg, photo (2).jpg, photo (3).jpg */
@@ -117,7 +120,7 @@ async function listOutputs(dir: string): Promise<OutputFile[]> {
 	);
 }
 
-export function createJobService({ queue, storage, registry, runners }: ServiceDeps) {
+export function createJobService({ queue, storage, registry, runners, readiness }: ServiceDeps) {
 	const records = new Map<string, JobRecord>();
 
 	function launch(record: JobRecord & { id: string }) {
@@ -147,6 +150,14 @@ export function createJobService({ queue, storage, registry, runners }: ServiceD
 			const tool = registry.get(toolId);
 			if (!tool) throw new ServiceError(404, `Unknown Tool: ${toolId}`);
 			if (!runners[toolId]) throw new ServiceError(503, `${tool.name} is not ready.`);
+			const ready = readiness?.[toolId];
+			if (ready && !ready.ready) {
+				throw new ServiceError(
+					503,
+					`${tool.name} is not ready. ${ready.problem}`,
+					ready.fix ? { fix: ready.fix } : undefined
+				);
+			}
 
 			const filename = basename(request.filename ?? '');
 			if (!filename || filename === '.' || filename === '..') {

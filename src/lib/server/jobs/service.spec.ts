@@ -325,4 +325,29 @@ describe('job service', () => {
 		).rejects.toMatchObject({ status: 503, message: 'Compress is not ready.' });
 		expect(await readdir(root)).toEqual([]);
 	});
+
+	it('explains why a Tool is not ready and how to fix it', async () => {
+		const service = createJobService({
+			queue: createJobQueue({ heavy: 1, light: 2 }),
+			storage: createJobStorage(root),
+			registry,
+			runners: { 'image/compress': copyRunner },
+			readiness: {
+				'image/compress': {
+					ready: false,
+					problem: 'ffmpeg is not installed.',
+					fix: 'brew install ffmpeg'
+				}
+			}
+		});
+
+		await expect(
+			service.start('image/compress', { filename: 'a.jpg', query: {}, body: body('x') })
+		).rejects.toMatchObject({
+			status: 503,
+			message: 'Compress is not ready. ffmpeg is not installed.',
+			details: { fix: 'brew install ffmpeg' }
+		});
+		expect(await readdir(root)).toEqual([]);
+	});
 });

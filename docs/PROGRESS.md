@@ -29,7 +29,7 @@ Design session finished on 2026-10-29. Stack switched from Next.js to SvelteKit 
 
 - [ ] 1. Spike Remove vocal (deferred on 2026-11-06: run it before step 5): install `ffmpeg`, set up Python 3.12 with `uv`, compare MDX-Net vs BS-RoFormer on one song (time and RAM on an 8 GB M1), pick the Fast and Best models.
 - [x] 2. Project setup: `npx sv create` (SvelteKit + TS + Tailwind + Vitest + ESLint + Prettier), `adapter-node`, port 3200, `git init` on `develop`, `.gitignore`, project `CLAUDE.md`.
-- [ ] 3. Core: Tool registry, Job + Lanes (TDD), API, `.data/jobs/` storage, 24-hour cleanup, dependency checks, `pnpm run setup`.
+- [x] 3. Core: Tool registry, Job + Lanes (TDD), API, `.data/jobs/` storage, 24-hour cleanup, dependency checks, `pnpm run setup`.
 - [ ] 4. Image Tools + integration tests.
 - [ ] 5. Music Tools + Python script.
 - [ ] 6. UI design with `impeccable` (Arknights-inspired black and blue, restrained), then sidebar + search, home, Tool page, compare, audio preview.
