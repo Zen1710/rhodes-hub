@@ -26,6 +26,12 @@ export interface Job<O = unknown> {
 	progress: number;
 	output?: O;
 	error?: string;
+	/** Epoch ms when the Job reached done, failed, or canceled. */
+	finishedAt?: number;
+}
+
+export interface QueueOptions {
+	now?: () => number;
 }
 
 interface Entry {
@@ -34,7 +40,10 @@ interface Entry {
 	controller?: AbortController;
 }
 
-export function createJobQueue(limits: Record<Lane, number>) {
+export function createJobQueue(
+	limits: Record<Lane, number>,
+	{ now = Date.now }: QueueOptions = {}
+) {
 	const entries = new Map<string, Entry>();
 	const waiting: Record<Lane, string[]> = { heavy: [], light: [] };
 	const running: Record<Lane, number> = { heavy: 0, light: 0 };
@@ -67,11 +76,13 @@ export function createJobQueue(limits: Record<Lane, number>) {
 					job.status = 'done';
 					job.progress = 1;
 					job.output = output;
+					job.finishedAt = now();
 				},
 				(error: unknown) => {
 					if (job.status === 'canceled') return;
 					job.status = 'failed';
 					job.error = error instanceof Error ? error.message : String(error);
+					job.finishedAt = now();
 				}
 			)
 			.finally(() => {
@@ -110,8 +121,10 @@ export function createJobQueue(limits: Record<Lane, number>) {
 				const lane = waiting[entry.job.lane];
 				lane.splice(lane.indexOf(id), 1);
 				entry.job.status = 'canceled';
+				entry.job.finishedAt = now();
 			} else if (entry.job.status === 'running') {
 				entry.job.status = 'canceled';
+				entry.job.finishedAt = now();
 				entry.controller?.abort();
 			}
 		},
@@ -119,6 +132,17 @@ export function createJobQueue(limits: Record<Lane, number>) {
 		get(id: string): Job | undefined {
 			const entry = entries.get(id);
 			return entry ? { ...entry.job } : undefined;
+		},
+
+		list(): Job[] {
+			return [...entries.values()].map((entry) => ({ ...entry.job }));
+		},
+
+		/** Forgets a finished Job. Returns false for unknown, queued, or running Jobs. */
+		remove(id: string): boolean {
+			const entry = entries.get(id);
+			if (!entry || entry.job.finishedAt === undefined) return false;
+			return entries.delete(id);
 		}
 	};
 }

@@ -205,4 +205,43 @@ describe('job queue', () => {
 		expect(queue.retry(running.id)).toBeUndefined();
 		expect(queue.retry('missing-id')).toBeUndefined();
 	});
+	it('records when a Job finished, whether done, failed, or canceled', async () => {
+		let now = 1_000;
+		const queue = createJobQueue({ heavy: 1, light: 2 }, { now: () => now });
+		const { run, calls } = controlledRun();
+		const done = queue.submit({ toolId: 'm', lane: 'light', input: 'a', settings: {}, run });
+		const failed = queue.submit({ toolId: 'm', lane: 'light', input: 'b', settings: {}, run });
+		const canceled = queue.submit({ toolId: 'm', lane: 'heavy', input: 'c', settings: {}, run });
+		await flush();
+
+		expect(queue.get(done.id)?.finishedAt).toBeUndefined();
+
+		now = 2_000;
+		calls[0].resolve('out');
+		calls[1].reject(new Error('boom'));
+		await flush();
+		now = 3_000;
+		queue.cancel(canceled.id);
+
+		expect(queue.get(done.id)?.finishedAt).toBe(2_000);
+		expect(queue.get(failed.id)?.finishedAt).toBe(2_000);
+		expect(queue.get(canceled.id)?.finishedAt).toBe(3_000);
+	});
+	it('removes finished Jobs from memory but refuses queued or running ones', async () => {
+		const queue = createJobQueue({ heavy: 1, light: 2 });
+		const { run, calls } = controlledRun();
+		const finished = queue.submit({ toolId: 'm', lane: 'heavy', input: 'a', settings: {}, run });
+		const running = queue.submit({ toolId: 'm', lane: 'heavy', input: 'b', settings: {}, run });
+		const queued = queue.submit({ toolId: 'm', lane: 'heavy', input: 'c', settings: {}, run });
+		await flush();
+		calls[0].resolve('out');
+		await flush();
+
+		expect(queue.remove(finished.id)).toBe(true);
+		expect(queue.remove(running.id)).toBe(false);
+		expect(queue.remove(queued.id)).toBe(false);
+		expect(queue.get(finished.id)).toBeUndefined();
+		expect(queue.get(running.id)?.status).toBe('running');
+		expect(queue.get(queued.id)?.status).toBe('queued');
+	});
 });
