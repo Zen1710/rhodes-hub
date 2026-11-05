@@ -1,0 +1,39 @@
+# Dependencies and build output
+node_modules/
+.svelte-kit/
+build/
+dist/
+coverage/
+
+# Runtime data (Jobs, uploads, outputs)
+.data/
+
+# Python environment and model cache
+python/.venv/
+__pycache__/
+*.pyc
+models/
+.cache/
+
+# Secrets and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+id_rsa*
+*credentials*.json
+*service-account*.json
+
+# Impeccable local working files (keep surfaces/ and config.json)
+.impeccable/mocks/
+.impeccable/questions/
+.impeccable/review/
+.impeccable/build/
+.impeccable/config.local.json
+
+# Logs and OS/editor files
+*.log
+.DS_Store
+.vscode/
+.idea/
