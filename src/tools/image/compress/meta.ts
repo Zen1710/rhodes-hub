@@ -3,10 +3,10 @@ import { defineTool } from '#lib/tools/types.ts';
 export default defineTool({
 	name: 'Compress',
 	description: 'Shrink file size, keep the look.',
-	keywords: ['compress', 'shrink', 'optimize', 'reduce size', 'jpg', 'png', 'webp'],
+	keywords: ['compress', 'shrink', 'optimize', 'reduce size', 'jpg', 'png', 'webp', 'heic'],
 	lane: 'light',
 	order: 1,
-	accepts: { extensions: ['jpg', 'jpeg', 'png', 'webp'], noun: 'image' },
+	accepts: { extensions: ['jpg', 'jpeg', 'png', 'webp', 'heic'], noun: 'image' },
 	maxBytes: 50 * 1024 * 1024,
 	dependencies: [],
 	settings: {
