@@ -3,10 +3,10 @@ import { defineTool } from '#lib/tools/types.ts';
 export default defineTool({
 	name: 'Resize',
 	description: 'Scale to exact pixels or a percentage.',
-	keywords: ['resize', 'scale', 'dimensions', 'width', 'height', 'smaller'],
+	keywords: ['resize', 'scale', 'dimensions', 'width', 'height', 'smaller', 'heic'],
 	lane: 'light',
 	order: 2,
-	accepts: { extensions: ['jpg', 'jpeg', 'png', 'webp'], noun: 'image' },
+	accepts: { extensions: ['jpg', 'jpeg', 'png', 'webp', 'heic'], noun: 'image' },
 	maxBytes: 50 * 1024 * 1024,
 	dependencies: [],
 	settings: {
