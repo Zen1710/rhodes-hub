@@ -3,10 +3,10 @@ import { defineTool } from '#lib/tools/types.ts';
 export default defineTool({
 	name: 'Convert format',
 	description: 'Turn one image format into another.',
-	keywords: ['convert', 'format', 're-encode', 'jpg', 'png', 'webp', 'avif'],
+	keywords: ['convert', 'format', 're-encode', 'jpg', 'png', 'webp', 'avif', 'heic'],
 	lane: 'light',
 	order: 3,
-	accepts: { extensions: ['jpg', 'jpeg', 'png', 'webp', 'avif'], noun: 'image' },
+	accepts: { extensions: ['jpg', 'jpeg', 'png', 'webp', 'avif', 'heic'], noun: 'image' },
 	maxBytes: 50 * 1024 * 1024,
 	dependencies: [],
 	settings: {
