@@ -17,6 +17,7 @@ describe('Compress', () => {
 		expect(out.size).toBeLessThan(result.inputSize);
 		expect(meta).toMatchObject({ format: 'jpeg', width: 320, height: 240 });
 		expect(meta.exif).toBeUndefined();
+		expect(result.note).toBeUndefined();
 		await result.cleanup();
 	});
 
@@ -67,6 +68,7 @@ describe('Compress', () => {
 
 		expect(out.name).toBe('photo.jpg');
 		expect(await readFile(out.path)).toEqual(await readFile(resolve('tests/fixtures/photo.jpg')));
+		expect(result.note).toBe('Already optimized');
 		await result.cleanup();
 	});
 

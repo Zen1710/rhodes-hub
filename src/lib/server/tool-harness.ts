@@ -6,6 +6,7 @@ import type { ToolRunner } from './jobs/service';
 export interface HarnessResult {
 	inputSize: number;
 	outputs: { name: string; path: string; size: number }[];
+	note?: string;
 	cleanup: () => Promise<void>;
 }
 
@@ -26,8 +27,9 @@ export async function runOnFixture(
 	await copyFile(source, inputPath);
 
 	const cleanup = () => rm(root, { recursive: true, force: true });
+	let result;
 	try {
-		await run({ inputPath, outputDir, settings, signal, reportProgress: () => {} });
+		result = await run({ inputPath, outputDir, settings, signal, reportProgress: () => {} });
 	} catch (error) {
 		await cleanup();
 		throw error;
@@ -39,5 +41,5 @@ export async function runOnFixture(
 			return { name, path, size: (await stat(path)).size };
 		})
 	);
-	return { inputSize: (await stat(inputPath)).size, outputs, cleanup };
+	return { inputSize: (await stat(inputPath)).size, outputs, note: result?.note, cleanup };
 }

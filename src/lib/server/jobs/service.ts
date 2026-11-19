@@ -21,8 +21,11 @@ export interface ToolRunContext {
 	reportProgress: (progress: number) => void;
 }
 
-/** What a Tool's `run.ts` default-exports. Every file written to `outputDir` becomes a Job output. */
-export type ToolRunner = (ctx: ToolRunContext) => Promise<void>;
+/**
+ * What a Tool's `run.ts` default-exports. Every file written to `outputDir` becomes a Job output.
+ * It may return a `note` for the user about the result, such as "Already optimized".
+ */
+export type ToolRunner = (ctx: ToolRunContext) => Promise<void | { note?: string }>;
 
 export interface OutputFile {
 	name: string;
@@ -38,6 +41,13 @@ export interface JobView {
 	error?: string;
 	finishedAt?: number;
 	files?: OutputFile[];
+	/** What the Tool said about a done Job's result. */
+	note?: string;
+}
+
+interface JobOutput {
+	files: OutputFile[];
+	note?: string;
 }
 
 export interface Download {
@@ -134,13 +144,14 @@ export function createJobService({ queue, storage, registry, runners, readiness 
 			lane: tool.lane,
 			input: inputPath,
 			settings,
-			run: async ({ signal, reportProgress }) => {
+			run: async ({ signal, reportProgress }): Promise<JobOutput> => {
+				let result;
 				try {
-					await runner({ inputPath, outputDir, settings, signal, reportProgress });
+					result = await runner({ inputPath, outputDir, settings, signal, reportProgress });
 				} finally {
 					if (signal.aborted) await emptyDir(outputDir);
 				}
-				return listOutputs(outputDir);
+				return { files: await listOutputs(outputDir), note: result?.note };
 			}
 		});
 	}
@@ -275,6 +286,7 @@ export function createJobService({ queue, storage, registry, runners, readiness 
 			const job = queue.get(id);
 			const record = records.get(id);
 			if (!job || !record) return undefined;
+			const output = job.output as JobOutput | undefined;
 			return {
 				id: job.id,
 				toolId: job.toolId,
@@ -283,7 +295,8 @@ export function createJobService({ queue, storage, registry, runners, readiness 
 				progress: job.progress,
 				error: job.error,
 				finishedAt: job.finishedAt,
-				files: job.output as OutputFile[] | undefined
+				files: output?.files,
+				note: output?.note
 			};
 		}
 	};

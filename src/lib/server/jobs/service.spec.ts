@@ -90,6 +90,28 @@ describe('job service', () => {
 			files: [{ name: 'photo.jpg.out', size: 'pixels|{"quality":60}'.length }]
 		});
 		expect(await readdir(join(root, job.id, 'input'))).toEqual(['photo.jpg']);
+		expect(service.get(job.id)?.note).toBeUndefined();
+	});
+
+	it('passes on a note the Tool leaves about its result', async () => {
+		const { service } = setup({
+			'image/compress': async (ctx) => {
+				await copyRunner(ctx);
+				return { note: 'Already optimized' };
+			}
+		});
+
+		const job = await service.start('image/compress', {
+			filename: 'photo.jpg',
+			query: {},
+			body: body('pixels')
+		});
+
+		expect(await settled(service, job.id)).toMatchObject({
+			status: 'done',
+			note: 'Already optimized',
+			files: [{ name: 'photo.jpg.out' }]
+		});
 	});
 
 	it('refuses bad requests with a status and message, leaving nothing on disk', async () => {

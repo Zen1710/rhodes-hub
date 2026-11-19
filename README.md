@@ -51,7 +51,7 @@ Errors return `{ "error": "<message>", "details": { … } }` with status `400` (
 
 ### Check a Job
 
-`GET /api/jobs/<id>` returns the Job. `status` is `queued`, `running`, `done`, `failed`, or `canceled`; `progress` goes from 0 to 1; a `done` Job lists its `files` with `name` and `size`, and a `failed` Job carries `error`.
+`GET /api/jobs/<id>` returns the Job. `status` is `queued`, `running`, `done`, `failed`, or `canceled`; `progress` goes from 0 to 1; a `done` Job lists its `files` with `name` and `size`, and a `failed` Job carries `error`. A `done` Job may also carry a `note` about its result: Compress says `"Already optimized"` when re-encoding would have made the file bigger, so it hands back the original.
 
 ### Download results
 

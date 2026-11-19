@@ -33,8 +33,11 @@ const run: ToolRunner = async ({ inputPath, outputDir, settings, signal }) => {
 	const grew = encoded.byteLength >= (await stat(inputPath)).size;
 	const originalFits =
 		format === image.format && (metadata === 'keep' || !(await hasMetadata(inputPath)));
-	if (grew && originalFits) await copyFile(inputPath, outputPath);
-	else await writeFile(outputPath, encoded);
+	if (grew && originalFits) {
+		await copyFile(inputPath, outputPath);
+		return { note: 'Already optimized' };
+	}
+	await writeFile(outputPath, encoded);
 };
 
 export default run;
