@@ -3,10 +3,10 @@ import { defineTool } from '#lib/tools/types.ts';
 export default defineTool({
 	name: 'Sharpen',
 	description: 'Recover detail in soft photos.',
-	keywords: ['sharpen', 'detail', 'blur', 'soft', 'scan', 'enhance'],
+	keywords: ['sharpen', 'detail', 'blur', 'soft', 'scan', 'enhance', 'heic'],
 	lane: 'light',
 	order: 4,
-	accepts: { extensions: ['jpg', 'jpeg', 'png', 'webp'], noun: 'image' },
+	accepts: { extensions: ['jpg', 'jpeg', 'png', 'webp', 'heic'], noun: 'image' },
 	maxBytes: 50 * 1024 * 1024,
 	dependencies: [],
 	settings: {
