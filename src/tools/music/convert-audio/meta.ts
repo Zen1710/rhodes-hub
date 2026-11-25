@@ -42,7 +42,8 @@ export default defineTool({
 				{ value: '44100', label: '44.1 kHz' },
 				{ value: '48000', label: '48 kHz' }
 			],
-			default: 'same'
+			default: 'same',
+			hint: 'OGG is always 48 kHz.'
 		}
 	}
 });
