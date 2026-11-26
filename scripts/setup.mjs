@@ -1,7 +1,6 @@
 // Prepares this machine for Rhodes Hub. Safe to run again at any time.
 // It never installs system software for you: it prints the command to run instead.
 import { spawnSync } from 'node:child_process';
-import { existsSync } from 'node:fs';
 
 const has = (command, args = ['--version']) =>
 	spawnSync(command, args, { stdio: 'ignore' }).status === 0;
@@ -20,13 +19,25 @@ else todo('ffmpeg is not installed (needed by the Music tools)', 'brew install f
 
 if (!has('uv')) {
 	todo('uv is not installed (needed for Remove vocal)', 'brew install uv');
-} else if (!existsSync('python/pyproject.toml')) {
-	ok('uv (the Python environment for Remove vocal arrives in a later build step)');
 } else {
 	console.log('  ...   uv sync in python/');
 	const sync = spawnSync('uv', ['sync'], { cwd: 'python', stdio: 'inherit' });
-	if (sync.status === 0) ok('Python environment for Remove vocal');
-	else todo('uv sync failed in python/', 'cd python && uv sync');
+	if (sync.status !== 0) {
+		todo('uv sync failed in python/', 'cd python && uv sync');
+	} else if (has('python/.venv/bin/python', ['python/separate.py', '--check'])) {
+		ok('Python environment and vocal model for Remove vocal');
+	} else {
+		console.log('  ...   downloading the vocal model (about 70 MB, once)');
+		const setup = spawnSync('python/.venv/bin/python', ['python/separate.py', '--setup'], {
+			stdio: 'inherit'
+		});
+		if (setup.status === 0) ok('Python environment and vocal model for Remove vocal');
+		else
+			todo(
+				'the vocal model did not download',
+				'python/.venv/bin/python python/separate.py --setup'
+			);
+	}
 }
 
 console.log(

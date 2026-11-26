@@ -27,7 +27,7 @@ const CHECKS: Record<
 	},
 	'vocal-separator': {
 		command: PYTHON,
-		args: ['-c', 'import audio_separator'],
+		args: ['python/separate.py', '--check'],
 		problem: 'The vocal separation model is not set up.',
 		fix: 'pnpm run setup'
 	}

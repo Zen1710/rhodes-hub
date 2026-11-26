@@ -15,7 +15,10 @@ export async function runOnFixture(
 	run: ToolRunner,
 	fixture: string,
 	settings: Record<string, unknown>,
-	{ signal = new AbortController().signal } = {}
+	{
+		signal = new AbortController().signal,
+		reportProgress = () => {}
+	}: { signal?: AbortSignal; reportProgress?: (progress: number) => void } = {}
 ): Promise<HarnessResult> {
 	const root = await mkdtemp(join(tmpdir(), 'rhodes-tool-'));
 	const inputDir = join(root, 'input');
@@ -29,7 +32,7 @@ export async function runOnFixture(
 	const cleanup = () => rm(root, { recursive: true, force: true });
 	let result;
 	try {
-		result = await run({ inputPath, outputDir, settings, signal, reportProgress: () => {} });
+		result = await run({ inputPath, outputDir, settings, signal, reportProgress });
 	} catch (error) {
 		await cleanup();
 		throw error;

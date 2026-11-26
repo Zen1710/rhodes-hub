@@ -11,16 +11,6 @@ export default defineTool({
 	maxDurationSec: 15 * 60,
 	dependencies: ['ffmpeg', 'ffprobe', 'vocal-separator'],
 	settings: {
-		quality: {
-			type: 'select',
-			label: 'Quality',
-			options: [
-				{ value: 'fast', label: 'Fast' },
-				{ value: 'best', label: 'Best' }
-			],
-			default: 'fast',
-			hint: 'Best is cleaner but slower.'
-		},
 		format: {
 			type: 'select',
 			label: 'Output format',

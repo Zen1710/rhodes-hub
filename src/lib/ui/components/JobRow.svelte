@@ -1,4 +1,6 @@
 <script lang="ts">
+	import DownloadIcon from '@lucide/svelte/icons/download';
+	import StemPlayer from './StemPlayer.svelte';
 	import { resolve } from '$app/paths';
 	import { extensionOf, formatBytes } from '#lib/tools/input.ts';
 	import { registry } from '#lib/tools/index.ts';
@@ -52,6 +54,11 @@
 			job?.files?.length === 1
 	);
 
+	/** Music Tools that split one song into several files get a player per file. */
+	const stems = $derived(
+		tool.category === 'music' && (job?.files?.length ?? 0) > 1 ? job!.files : undefined
+	);
+
 	const button =
 		'rounded border border-control-rule px-3 py-1.5 text-[17px] font-semibold transition-colors hover:border-text-3';
 </script>
@@ -98,6 +105,25 @@
 					Cancel
 				</button>
 			</div>
+		{:else if entry.state === 'done' && job && stems}
+			<div class="flex flex-wrap items-center justify-between gap-3">
+				<p class="text-[17px] text-text-3">
+					Vocals and Instrumental · {formatBytes(stems.reduce((sum, f) => sum + f.size, 0))}
+				</p>
+				<a
+					href={resolve('/api/jobs/[id]/download', { id: job.id })}
+					download
+					class="{button} flex items-center gap-1.5 text-text"
+				>
+					<DownloadIcon size={14} aria-hidden="true" />
+					Download both
+				</a>
+			</div>
+			<div class="flex flex-col pt-1.5">
+				{#each stems as stem (stem.name)}
+					<StemPlayer jobId={job.id} file={stem.name} />
+				{/each}
+			</div>
 		{:else if entry.state === 'done' && job}
 			<p class="text-[17px] text-text-3">
 				{doneMeta(result)}{job.note ? ` · ${job.note}` : ''}
@@ -126,7 +152,7 @@
 		{/if}
 	</div>
 
-	{#if entry.state === 'done'}
+	{#if entry.state === 'done' && !stems}
 		{@const numeral = resultNumeral(tool.result, result)}
 		<p
 			class={[
@@ -147,7 +173,7 @@
 		>
 			{Math.round(progress * 100)}%
 		</p>
-	{:else}
+	{:else if entry.state !== 'done'}
 		<p
 			class={[
 				'shrink-0 text-[18px] font-bold',
