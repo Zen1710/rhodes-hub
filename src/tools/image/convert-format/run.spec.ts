@@ -44,4 +44,13 @@ describe('Convert format', () => {
 		expect(data[1]).toBeGreaterThan(150);
 		await result.cleanup();
 	});
+
+	it('does nothing once the Job is canceled', async () => {
+		const controller = new AbortController();
+		controller.abort();
+
+		await expect(
+			runOnFixture(run, 'photo.jpg', defaults, { signal: controller.signal })
+		).rejects.toThrow();
+	});
 });

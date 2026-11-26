@@ -50,4 +50,13 @@ describe('Resize', () => {
 		expect(meta.isPalette).toBe(false);
 		await result.cleanup();
 	});
+
+	it('does nothing once the Job is canceled', async () => {
+		const controller = new AbortController();
+		controller.abort();
+
+		await expect(
+			runOnFixture(run, 'photo.jpg', defaults, { signal: controller.signal })
+		).rejects.toThrow();
+	});
 });
