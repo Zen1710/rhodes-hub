@@ -6,6 +6,7 @@ export default defineTool({
 	keywords: ['compress', 'shrink', 'optimize', 'reduce size', 'jpg', 'png', 'webp', 'heic'],
 	lane: 'light',
 	order: 1,
+	result: 'saving',
 	accepts: { extensions: ['jpg', 'jpeg', 'png', 'webp', 'heic'], noun: 'image' },
 	maxBytes: 50 * 1024 * 1024,
 	dependencies: [],

@@ -33,6 +33,7 @@ Design session finished on 2026-10-29. Stack switched from Next.js to SvelteKit 
 - [x] 4. Image Tools + integration tests.
 - [ ] 5. Music Tools + Python script.
 - [ ] 6. UI design with `impeccable` (Arknights-inspired black and blue, restrained), then sidebar + search, home, Tool page, compare, audio preview.
+  - 2026-11-26: Aurora design (from `design/rhodes-hub.pen`) built: sidebar, `⌘K` palette, home with Running now, Tool page (drop, settings, Job column, cancel/retry/download), Compare, Not ready. Left: audio preview (lands with Remove vocal in step 5) and the `impeccable` review.
 - [ ] 7. Polish: `impeccable` review, README + API docs, publish to GitHub.
 
 ## Later (v2)

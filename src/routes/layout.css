@@ -1,1 +1,45 @@
 @import 'tailwindcss';
+@import '@fontsource-variable/darker-grotesque';
+
+@theme {
+	--color-bg: #0b0d10;
+	--color-surface: #14181d;
+	--color-rule: #22282f;
+	--color-control-rule: #3a434c;
+	--color-field: #0d1620;
+	--color-field-rule: rgb(255 255 255 / 0.18);
+	--color-field-text: #c9d6e0;
+	--color-select: #132a3d;
+	--color-accent-fill: #2878b5;
+	--color-accent: #4a9fd8;
+	--color-text: #f2f4f6;
+	--color-text-2: #a3acb5;
+	--color-text-3: #7f8992;
+	--color-danger: #f07a6a;
+	--font-sans: 'Darker Grotesque Variable', ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer base {
+	html {
+		color-scheme: dark;
+		background: var(--color-bg);
+		color: var(--color-text);
+		font-family: var(--font-sans);
+		font-weight: 500;
+		font-variant-numeric: tabular-nums;
+		-webkit-font-smoothing: antialiased;
+	}
+
+	:focus-visible {
+		outline: 2px solid var(--color-accent);
+		outline-offset: 2px;
+	}
+}
+
+/* The one lit field per screen: dark blue under a soft glow. */
+.field {
+	background:
+		radial-gradient(120% 70% at 0% 0%, rgb(40 120 181 / 0.32), transparent 60%),
+		radial-gradient(90% 60% at 100% 100%, rgb(74 159 216 / 0.16), transparent 65%),
+		var(--color-field);
+}

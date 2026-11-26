@@ -6,6 +6,7 @@ export default defineTool({
 	keywords: ['convert', 'format', 're-encode', 'jpg', 'png', 'webp', 'avif', 'heic'],
 	lane: 'light',
 	order: 3,
+	result: 'format',
 	accepts: { extensions: ['jpg', 'jpeg', 'png', 'webp', 'avif', 'heic'], noun: 'image' },
 	maxBytes: 50 * 1024 * 1024,
 	dependencies: [],

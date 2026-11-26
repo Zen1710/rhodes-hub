@@ -2,8 +2,8 @@ import type { Category, Tool, ToolMeta } from './types';
 
 /** Every Category in display order. A Tool folder outside these is an error. */
 export const CATEGORIES = [
-	{ id: 'image', name: 'Image' },
-	{ id: 'music', name: 'Music' }
+	{ id: 'image', name: 'Image', note: 'sharp · Light lane' },
+	{ id: 'music', name: 'Music', note: 'ffmpeg and AI models' }
 ] as const;
 
 const REQUIRED: (keyof ToolMeta)[] = [
@@ -40,9 +40,10 @@ export function buildRegistry(modules: Record<string, { default: ToolMeta }>): R
 		return { ...module.default, id, category, slug };
 	});
 
-	const categories: Category[] = CATEGORIES.map(({ id, name }) => ({
+	const categories: Category[] = CATEGORIES.map(({ id, name, note }) => ({
 		id,
 		name,
+		note,
 		tools: tools
 			.filter((tool) => tool.category === id)
 			.sort((a, b) => (a.order ?? Infinity) - (b.order ?? Infinity) || a.name.localeCompare(b.name))

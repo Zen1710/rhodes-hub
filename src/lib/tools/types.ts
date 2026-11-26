@@ -58,6 +58,11 @@ export interface ToolMeta extends InputRules {
 	settings: SettingsSchema;
 	/** Position inside its Category; lower comes first. */
 	order?: number;
+	/**
+	 * What the large numeral on a done Job shows: the size change (`saving`), the output
+	 * format (`format`), or the output width (`width`). Left out, it says "Done".
+	 */
+	result?: 'saving' | 'format' | 'width';
 }
 
 export interface Tool extends ToolMeta {
@@ -70,6 +75,8 @@ export interface Tool extends ToolMeta {
 export interface Category {
 	id: string;
 	name: string;
+	/** What powers the Category, shown under its name on the home page. */
+	note: string;
 	tools: Tool[];
 }
 

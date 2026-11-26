@@ -6,6 +6,7 @@ export default defineTool({
 	keywords: ['resize', 'scale', 'dimensions', 'width', 'height', 'smaller', 'heic'],
 	lane: 'light',
 	order: 2,
+	result: 'width',
 	accepts: { extensions: ['jpg', 'jpeg', 'png', 'webp', 'heic'], noun: 'image' },
 	maxBytes: 50 * 1024 * 1024,
 	dependencies: [],
