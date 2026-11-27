@@ -5,7 +5,7 @@
 	import { extensionOf, formatBytes } from '#lib/tools/input.ts';
 	import { registry } from '#lib/tools/index.ts';
 	import type { Tool } from '#lib/tools/types.ts';
-	import { doneMeta, ordinal, resultNumeral, timeLeft } from '#lib/ui/format.ts';
+	import { doneMeta, ordinal, resultNumeral, settingsSummary, timeLeft } from '#lib/ui/format.ts';
 	import { jobs, type Entry } from '#lib/ui/jobs.svelte.ts';
 
 	let {
@@ -45,6 +45,10 @@
 		outputs: job?.files ?? [],
 		width
 	});
+
+	const numeral = $derived(resultNumeral(tool.result, result));
+	/** A size change that made the file bigger is shown muted, never as a win. */
+	const grew = $derived(numeral.startsWith('+'));
 
 	/** Compare needs the dropped file (gone after a reload) and formats the browser can show. */
 	const canCompare = $derived(
@@ -108,7 +112,9 @@
 		{:else if entry.state === 'done' && job && stems}
 			<div class="flex flex-wrap items-center justify-between gap-3">
 				<p class="text-[17px] text-text-3">
-					Vocals and Instrumental · {formatBytes(stems.reduce((sum, f) => sum + f.size, 0))}
+					Vocals and Instrumental · {formatBytes(
+						stems.reduce((sum, f) => sum + f.size, 0)
+					)}{entry.settings ? ` · ${settingsSummary(tool, entry.settings)}` : ''}
 				</p>
 				<a
 					href={resolve('/api/jobs/[id]/download', { id: job.id })}
@@ -126,8 +132,13 @@
 			</div>
 		{:else if entry.state === 'done' && job}
 			<p class="text-[17px] text-text-3">
-				{doneMeta(result)}{job.note ? ` · ${job.note}` : ''}
+				{doneMeta(result)}{job.note ? ` · ${job.note}` : ''}{grew
+					? ' · Larger than the original'
+					: ''}
 			</p>
+			{#if entry.settings}
+				<p class="text-[17px] text-text-3">{settingsSummary(tool, entry.settings)}</p>
+			{/if}
 			<div class="flex gap-2 pt-1.5">
 				<a
 					href={resolve('/api/jobs/[id]/download', { id: job.id })}
@@ -153,13 +164,13 @@
 	</div>
 
 	{#if entry.state === 'done' && !stems}
-		{@const numeral = resultNumeral(tool.result, result)}
 		<p
 			class={[
 				'shrink-0 leading-none font-extrabold',
 				numeral === 'Done'
 					? 'text-[36px] tracking-[-1px] text-text-2'
-					: 'text-[68px] tracking-[-2.5px] text-text'
+					: 'text-[68px] tracking-[-2.5px]',
+				numeral !== 'Done' && (grew ? 'text-text-2' : 'text-text')
 			]}
 		>
 			{numeral}

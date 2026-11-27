@@ -15,13 +15,12 @@ export function extensionOf(filename: string): string | undefined {
 
 const MB = 1024 * 1024;
 
-/** 72 MB, 4.5 MB, 380 KB, in binary units (1 MB = 1024 KB). */
+/** 72 MB, 4.5 MB, 380 KB, 1.3 KB, 160 B, in binary units (1 MB = 1024 KB). */
 export function formatBytes(bytes: number): string {
-	if (bytes >= MB) {
-		const mb = bytes / MB;
-		return `${mb >= 10 ? Math.round(mb) : Math.round(mb * 10) / 10} MB`;
-	}
-	return `${Math.max(1, Math.round(bytes / 1024))} KB`;
+	const oneDecimal = (n: number) => (n >= 10 ? Math.round(n) : Math.round(n * 10) / 10);
+	if (bytes >= MB) return `${oneDecimal(bytes / MB)} MB`;
+	if (bytes >= 1024) return `${oneDecimal(bytes / 1024)} KB`;
+	return `${bytes} B`;
 }
 
 /** 1 h 52 min, 16 min 30 s, 45 s. */

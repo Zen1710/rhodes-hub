@@ -15,6 +15,8 @@ export interface Entry {
 	toolId: string;
 	filename: string;
 	inputSize?: number;
+	/** What the Job ran with, shown on its result. */
+	settings?: Record<string, unknown>;
 	state: EntryState;
 	/** Why a file was not added or its upload failed. */
 	reason?: string;
@@ -31,6 +33,7 @@ interface Saved {
 	toolId: string;
 	filename: string;
 	inputSize?: number;
+	settings?: Record<string, unknown>;
 	jobId: string;
 }
 
@@ -84,6 +87,7 @@ class Jobs {
 			toolId: saved.toolId,
 			filename: saved.filename,
 			inputSize: saved.inputSize,
+			settings: saved.settings,
 			state: 'queued',
 			job: { id: saved.jobId } as JobView
 		}));
@@ -114,6 +118,7 @@ class Jobs {
 				toolId: tool.id,
 				filename: file.name,
 				inputSize: file.size,
+				settings,
 				file,
 				state: check.ok ? 'waiting' : 'not-added',
 				reason: check.ok ? undefined : check.reason
@@ -236,11 +241,12 @@ class Jobs {
 	#save() {
 		const saved: Saved[] = this.entries
 			.filter((entry) => entry.job)
-			.map(({ key, toolId, filename, inputSize, job }) => ({
+			.map(({ key, toolId, filename, inputSize, settings, job }) => ({
 				key,
 				toolId,
 				filename,
 				inputSize,
+				settings,
 				jobId: job!.id
 			}));
 		try {

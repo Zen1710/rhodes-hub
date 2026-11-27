@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { checkInput } from './input';
+import { checkInput, formatBytes } from './input';
 import type { InputRules } from './types';
 
 const MB = 1024 * 1024;
@@ -50,5 +50,15 @@ describe('checkInput', () => {
 		});
 		expect(checkInput(song, { ...file, durationSec: 15 * 60 })).toEqual({ ok: true });
 		expect(checkInput(song, file)).toEqual({ ok: true });
+	});
+});
+
+describe('formatBytes', () => {
+	it('keeps small files distinguishable instead of rounding them all to 1 KB', () => {
+		expect(formatBytes(160)).toBe('160 B');
+		expect(formatBytes(1374)).toBe('1.3 KB');
+		expect(formatBytes(28_228)).toBe('28 KB');
+		expect(formatBytes(2.4 * 1024 * 1024)).toBe('2.4 MB');
+		expect(formatBytes(72 * 1024 * 1024)).toBe('72 MB');
 	});
 });

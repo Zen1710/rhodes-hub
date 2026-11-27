@@ -6,7 +6,7 @@ export default defineTool({
 	keywords: ['convert', 'audio', 'mp3', 'wav', 'flac', 'm4a', 'ogg', 'bitrate'],
 	lane: 'light',
 	order: 2,
-	result: 'saving',
+	result: 'format',
 	accepts: { extensions: ['mp3', 'wav', 'flac', 'm4a', 'ogg'], noun: 'audio file' },
 	maxBytes: 200 * 1024 * 1024,
 	dependencies: ['ffmpeg', 'ffprobe'],

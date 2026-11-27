@@ -55,7 +55,8 @@
 
 <PageHeader title={tool.name} description="{tool.description} Files stay on this Mac." />
 
-<div class="flex grow flex-wrap">
+<!-- On wide screens only the Job column scrolls, so the drop field and its settings stay in view. -->
+<div class="flex grow flex-wrap xl:min-h-0 xl:flex-nowrap">
 	{#if !readiness.ready}
 		<section class="flex min-w-120 grow basis-0 flex-col gap-4 border-r border-rule p-12 pt-12">
 			<p class="text-[17px] font-bold text-danger">Not ready</p>
@@ -159,7 +160,7 @@
 		</section>
 	{/if}
 
-	<section class="flex min-w-120 grow basis-0 flex-col px-12" aria-label="Jobs">
+	<section class="flex min-w-120 grow basis-0 flex-col px-12 xl:overflow-y-auto" aria-label="Jobs">
 		{#if entries.length > 0}
 			<div class="flex items-center justify-between border-b border-rule pt-6 pb-3.5">
 				<p class="text-[17px] font-semibold text-text-3">

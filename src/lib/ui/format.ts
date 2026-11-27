@@ -88,3 +88,21 @@ export function doneMeta(result: DoneResult): string {
 	);
 	return parts.join(' · ');
 }
+
+/** "Quality 60 · Width 1280 px · Same format": what a Job ran with, so results can be told apart. */
+export function settingsSummary(
+	tool: Pick<ToolMeta, 'settings'>,
+	values: Record<string, unknown>
+): string {
+	return Object.entries(tool.settings)
+		.filter(([key]) => key in values)
+		.map(([key, field]) => {
+			const value = values[key];
+			if (field.type === 'select') return field.options.find((o) => o.value === value)?.label;
+			if (field.type === 'number')
+				return `${field.label} ${value}${field.unit ? ` ${field.unit}` : ''}`;
+			return `${field.label} ${value ? 'on' : 'off'}`;
+		})
+		.filter(Boolean)
+		.join(' · ');
+}

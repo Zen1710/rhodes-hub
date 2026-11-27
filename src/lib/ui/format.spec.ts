@@ -1,5 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import { doneMeta, dropHint, dropTitle, ordinal, resultNumeral, timeLeft } from './format';
+import {
+	doneMeta,
+	dropHint,
+	dropTitle,
+	ordinal,
+	resultNumeral,
+	settingsSummary,
+	timeLeft
+} from './format';
+import type { SettingsSchema } from '#lib/tools/types.ts';
 
 const MB = 1024 * 1024;
 
@@ -84,5 +93,23 @@ describe('small words', () => {
 		expect(timeLeft(0.01, 10_000)).toBeUndefined();
 		expect(timeLeft(0.5, 3 * 60_000)).toBe('about 3 min left');
 		expect(timeLeft(0.9, 10_000)).toBe('less than a minute left');
+	});
+});
+
+describe('settingsSummary', () => {
+	it('names the settings a Job ran with, using option labels and units', () => {
+		const settings = {
+			quality: { type: 'number', label: 'Quality', min: 1, max: 100, default: 80 },
+			width: { type: 'number', label: 'Width', min: 0, max: 100, unit: 'px', default: 0 },
+			output: {
+				type: 'select',
+				label: 'Output',
+				options: [{ value: 'same', label: 'Same format' }],
+				default: 'same'
+			}
+		} satisfies SettingsSchema;
+		expect(settingsSummary({ settings }, { quality: 60, width: 1280, output: 'same' })).toBe(
+			'Quality 60 · Width 1280 px · Same format'
+		);
 	});
 });
