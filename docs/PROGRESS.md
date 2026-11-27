@@ -35,6 +35,7 @@ Design session finished on 2026-10-29. Stack switched from Next.js to SvelteKit 
 - [ ] 6. UI design with `impeccable` (Arknights-inspired black and blue, restrained), then sidebar + search, home, Tool page, compare, audio preview.
   - 2026-11-26: Aurora design (from `design/rhodes-hub.pen`) built: sidebar, `⌘K` palette, home with Running now, Tool page (drop, settings, Job column, cancel/retry/download), Compare, Not ready. Audio preview for Remove vocal added with step 5. `impeccable` critique ran on 2026-11-27 (28/40); its two P1 fixes are next.
 - [ ] 7. Polish: `impeccable` review, README + API docs, publish to GitHub.
+  - 2026-11-27: repo is public on GitHub under the MIT license; README covers the Tool list, setup, and settings per Tool in the API. The `impeccable` P2 fixes and a second review are left.
 
 ## Later (v2)
 
